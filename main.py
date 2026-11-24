@@ -23,11 +23,21 @@ MAX_CHARS = 120
 
 def main() -> int:
     fortune = FORTUNE.strip()
+    # The gate reads the file as one line of text: it must be 1-120
+    # characters, not only white space, and carry no line break of its own.
     if not 1 <= len(fortune) <= MAX_CHARS:
         print(
             f"fortune is {len(fortune)} characters; must be 1-{MAX_CHARS}",
             file=sys.stderr,
         )
+        return 1
+    if fortune != fortune.strip() or "\n" in fortune or "\r" in fortune:
+        print("fortune must be a single clean line", file=sys.stderr)
+        return 1
+    try:
+        fortune.encode("utf-8")
+    except UnicodeEncodeError:
+        print("fortune is not valid UTF-8 text", file=sys.stderr)
         return 1
 
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
